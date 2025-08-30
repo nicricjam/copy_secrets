@@ -47,9 +47,9 @@ jobs:
 
           <details><summary>Raw XML</summary>
 
-          \`\`\`xml
-          $($xml.OuterXml)
-          \`\`\`
+          ```xml
+          $xml.OuterXml
+          .```
 
           </details>
           "@
