@@ -36,11 +36,11 @@ jobs:
 
             $err_code = $xml_error.ErrorCode
             $err_desc = $xml_error.Description -replace '  ',"`r`n"
-            $err_msg = "Error: $err_code - $err_desc"
+            $err_msg = "$err_code - $err_desc"
             Write-Host "::error title=Invoke-ASCmd Failed::$err_msg"
 
             $summary = @"
-          ### ❌ XML Validation Failed
+          ### ❌ Invoke-ASCmd Failed
 
           **Code:** \$err_code\
           **Message:** $err_desc
