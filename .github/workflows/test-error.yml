@@ -46,7 +46,9 @@ jobs:
           **Message:** $err_desc
 
           <details><summary>Raw XML</summary>
+          ```xml
           "$($xml.OuterXml)"
+          ```
           </details>
           "@
 
