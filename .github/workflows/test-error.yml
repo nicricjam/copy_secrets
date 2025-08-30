@@ -1,0 +1,53 @@
+name: Test error handling
+on:
+  push:
+
+permissions:
+  contents: write
+  id-token: write
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  test-error:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Test sending error
+        run: |
+          [xml]$fail = '<return "><root :empty"><Exception :exception" /><Messages :exception"><Error ErrorCode="-1052311368" Description="The request to alter the semantic model was rejected because of insufficient permissions. In addition to Write permissions on the model, make sure you also have at least Use permissions on all data connections that the semantic model uses. Verify the connection configuration in the semantic model settings and contact the connection owner(s) to grant you the required permissions. See https://go.microsoft.com/fwlink/?linkid=2256853 to learn more.
+
+          Technical Details:
+          RootActivityId: bb8e9c6c-0f65-41ba-ba09-8c411efd84ab
+          Date (UTC): 8/26/2025 8:11:01 PM" Source="Microsoft Analysis Services" HelpFile="" /></Messages></root></return>
+          '
+          $xml  = $fail
+
+          if( $xml.InnerXml -match '<Error '){
+            $xml_error = $xml.return.root.Messages.Error
+
+            $err_code = $xml_error.ErrorCode
+            $err_desc = $xml_error.Description -replace '  ',"`r`n"
+            $err_msg = "Error: $err_code - $err_desc"
+            Write-Host "::error title=Invoke-ASCmd Failed::$err_msg"
+
+            $summary = @"
+          ### ❌ XML Validation Failed
+
+          **Code:** \$err_code\
+          **Message:** $err_desc
+
+          <details><summary>Raw XML</summary>
+
+          \`\`\`xml
+          $($xml.OuterXml)
+          \`\`\`
+
+          </details>
+          "@
+
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $summary
+            exit 1
+          }
